@@ -1,0 +1,63 @@
+#!/bin/sh
+
+INPUT_FILE="$1"
+OUTPUT_FILE="$2"
+
+# set ownership of output file, no matter if conversion was successful
+set -e
+finish() {
+  if [ "${PUID}" -a "${PGID}" -a -f "${OUTPUT_FILE}" ]; then
+    chown "${PUID}:${PGID}" "${OUTPUT_FILE}"
+  fi
+}
+trap 'finish' EXIT
+
+#
+# first ffmpeg call: retain only
+# - the first video and
+# - all streams (video, audio, subtitles, whatever) that match the language,
+# then create a MKV container and hand over to the second ffmpeg,
+# suppressing statistics (so that only statistics of the second call are shown)
+#
+# second ffmpeg call:
+# - configure vaapi to use hardware de- & encoding
+#     decoding:
+#      * '-hwaccel vaapi': use vaapi to decode input in hardware instead of software
+#      * '-hwaccel_device foo' use device 'foo' for decoding
+#      * '-hwaccel_output_format vaapi': keep decoded data in hardware (vaapi) format
+#     encoding:
+#      * 'format=nv12|vaapi,hwupload':
+#        accept either hardware (vaapi) format or software (nv12) as input formats for encoding.
+#        If 'vaapi': 'hwupload' is a null transformation.
+#        If 'nv12':  'hwupload' converts data to 'vaapi'.
+#      * '-filter_hw_device foo' and 'scale_vaapi=w=$VIDEO_WIDTH:h=-1': use hardware encoder to scale
+# - take input from stdin
+# - pick only the first video stream and the first audio stream, discard all other streams
+# - scale to $VIDEO_WIDTH width and appropriate height keeping aspect ratio
+# - limit video bitrate
+# - set audio format to stereo $AUDIO_CODEC with audio bitrate
+# - remove all audio metadata and set audio language
+#
+nice ffmpeg -hide_banner \
+            -nostats \
+            -i "${INPUT_FILE}" \
+            -map 0:v -map "0:m:language:${AUDIO_LANGUAGE}" \
+            -c copy \
+            -f matroska - \
+    | nice ffmpeg \
+            -hide_banner \
+            -init_hw_device "vaapi=foo:${VAAPI_DEVICE}" \
+            -hwaccel vaapi \
+            -hwaccel_device foo \
+            -hwaccel_output_format vaapi \
+            -filter_hw_device foo \
+            -i - \
+            -map 0:v:0 -map 0:a:0 \
+            -map_metadata:s:a -1 -metadata:s:a "language=${AUDIO_LANGUAGE}" \
+            -vf  "format=nv12|vaapi,hwupload,scale_vaapi=w=${VIDEO_WIDTH}:h=-1" \
+            -c:v "$VIDEO_CODEC" \
+            -b:v "$VIDEO_BITRATE" \
+            -c:a "$AUDIO_CODEC" \
+            -b:a "$AUDIO_BITRATE" \
+            -ac  "$AUDIO_CHANNELS" \
+            "${OUTPUT_FILE}"

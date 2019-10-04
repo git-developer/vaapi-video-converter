@@ -1,0 +1,20 @@
+---
+version: "2"
+services:
+  video-conversion:
+    image: jrottenberg/ffmpeg:vaapi
+    container_name: video-conversion
+    environment:
+      - VIDEO_BITRATE=1280k
+      - VIDEO_CODEC=h264_vaapi
+      - VIDEO_WIDTH=720
+      - AUDIO_BITRATE=128k
+      - AUDIO_CODEC=aac
+      - AUDIO_CHANNELS=2
+      - AUDIO_LANGUAGE=deu
+      - VAAPI_DEVICE=/dev/dri/renderD128
+    volumes:
+      - ./entrypoint:/entrypoint
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    entrypoint: [ "/entrypoint" ]
