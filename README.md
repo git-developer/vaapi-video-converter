@@ -11,21 +11,25 @@ A Docker-based video converter that uses VAAPI-compatible hardware for transcodi
 - A linux system with `docker-compose`
 
 On debian-based systems, `docker-compose` may be installed by calling
+
 ```$ sudo apt install docker-compose```
 
 By default, Docker may only be run by root users so that the output video is created with root permissions.
 This behavior may be adjusted by using an account that is member of the `docker` group.
 
 Example for adding user `alice` to group `docker`:
+
 ```$ sudo addgroup alice docker```
 
 The converter may then be started by user `alice`; the output file will be created with permissions for user `alice`.
 
 ## Examples
 Convert a video to a small MP4 with stereo audio in german for use on a mobile device:
+
 ```$ ./start /media/input.mkv /tmp/output.mp4```
 
 Use italian language:
+
 ```$ AUDIO_LANGUAGE=ita ./start /media/input.mkv /tmp/output.mkv```
 
 ## Environment variables
