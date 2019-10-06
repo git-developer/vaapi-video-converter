@@ -26,6 +26,6 @@ docker-compose run --rm                      \
   -v "${in_dir_host}:${in_dir_container}:ro" \
   -v "${out_dir_host}:${out_dir_container}"  \
   $env_args                                  \
-  video-conversion                           \
+  vaapi-video-converter                      \
   "${in_dir_container}/${in_file}"           \
   "${out_dir_container}/${out_file}"
