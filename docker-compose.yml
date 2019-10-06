@@ -1,9 +1,9 @@
 ---
 version: "2"
 services:
-  video-conversion:
+  vaapi-video-converter:
     image: jrottenberg/ffmpeg:vaapi
-    container_name: video-conversion
+    container_name: vaapi-video-converter
     environment:
       - VIDEO_BITRATE=1280k
       - VIDEO_CODEC=h264_vaapi
