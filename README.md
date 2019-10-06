@@ -14,15 +14,6 @@ On debian-based systems, `docker-compose` may be installed by calling
 
 ```$ sudo apt install docker-compose```
 
-By default, Docker may only be run by root users so that the output video is created with root permissions.
-This behavior may be adjusted by using an account that is member of the `docker` group.
-
-Example for adding user `alice` to group `docker`:
-
-```$ sudo addgroup alice docker```
-
-The converter may then be started by user `alice`; the output file will be created with permissions for user `alice`.
-
 ## Examples
 Convert a video to a small MP4 with stereo audio in german for use on a mobile device:
 
@@ -31,6 +22,10 @@ Convert a video to a small MP4 with stereo audio in german for use on a mobile d
 Use italian language:
 
 ```$ AUDIO_LANGUAGE=ita ./start /media/input.mkv /tmp/output.mkv```
+
+Create output video with permissions for user with user id and group id 1000:
+
+```$ PUID=1000 PGID=1000 ./start /media/input.mkv /tmp/output.mp4```
 
 ## Environment variables
 The following list shows environment variables that may be used to adjust the format of the output video, together with their defaults.
@@ -42,3 +37,5 @@ The following list shows environment variables that may be used to adjust the fo
 - `AUDIO_CHANNELS=2`
 - `AUDIO_LANGUAGE=deu`
 - `VAAPI_DEVICE=/dev/dri/renderD128`
+- `PUID`=_uid of current user_
+- `GUID`=_group of current user_
