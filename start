@@ -19,7 +19,7 @@ env_args="${env_args} -e PGID=${PGID:-$(id -g)}"
 [ "${AUDIO_CODEC}"    ] && env_args="${env_args} -e AUDIO_CODEC=${AUDIO_CODEC}"
 [ "${AUDIO_BITRATE}"  ] && env_args="${env_args} -e AUDIO_BITRATE=${AUDIO_BITRATE}"
 [ "${AUDIO_CHANNELS}" ] && env_args="${env_args} -e AUDIO_CHANNELS=${AUDIO_CHANNELS}"
-[ "${AUDIO_LANGUAGE}" ] && env_args="${env_args} -e LANGUAGE=${AUDIO_LANGUAGE}"
+[ "${AUDIO_LANGUAGE}" ] && env_args="${env_args} -e AUDIO_LANGUAGE=${AUDIO_LANGUAGE}"
 [ "${VAAPI_DEVICE}"   ] && env_args="${env_args} -e VAAPI_DEVICE=${VAAPI_DEVICE}"
 
 docker-compose run --rm                      \
