@@ -1,30 +1,40 @@
 #!/bin/sh
 
-[ -z "$2" -o ! -f "$1" ] && echo "Syntax: $(basename $0) <input-file> <output-file>" && return 1
+if [ ! -f "$1" ]; then
+  >&2 echo "Missing input file: '$1'"
+  >&2 echo "Syntax: $(basename $0) <input-file> <output-file>"
+  return 1
+fi
+if [ -z "$2" ]; then
+  >&2 echo "Missing argument for output file"
+  >&2 echo "Syntax: $(basename $0) <input-file> <output-file>"
+  return 1
+fi
 
 in_fullpath=$(realpath "$1")
 in_dir_host=$(dirname  "$in_fullpath")
 in_file=$(    basename "$in_fullpath")
-out_fullpath=$(realpath "$2")
+out_fullpath=$(realpath -m "$2")
 out_dir_host=$(dirname  "$out_fullpath")
 out_file=$(    basename "$out_fullpath")
 in_dir_container='/video/in'
 out_dir_container='/video/out'
+user="${PUID:-$(id -u)}:${PGID:-$(id -g)}"
+
 env_args=''
-env_args="${env_args} -e PUID=${PUID:-$(id -u)}"
-env_args="${env_args} -e PGID=${PGID:-$(id -g)}"
-[ "${VIDEO_CODEC}"    ] && env_args="${env_args} -e VIDEO_CODEC=${VIDEO_CODEC}"
-[ "${VIDEO_BITRATE}"  ] && env_args="${env_args} -e VIDEO_BITRATE=${VIDEO_BITRATE}"
-[ "${VIDEO_WIDTH}"    ] && env_args="${env_args} -e VIDEO_WIDTH=${VIDEO_WIDTH}"
-[ "${AUDIO_CODEC}"    ] && env_args="${env_args} -e AUDIO_CODEC=${AUDIO_CODEC}"
-[ "${AUDIO_BITRATE}"  ] && env_args="${env_args} -e AUDIO_BITRATE=${AUDIO_BITRATE}"
-[ "${AUDIO_CHANNELS}" ] && env_args="${env_args} -e AUDIO_CHANNELS=${AUDIO_CHANNELS}"
-[ "${AUDIO_LANGUAGE}" ] && env_args="${env_args} -e AUDIO_LANGUAGE=${AUDIO_LANGUAGE}"
-[ "${VAAPI_DEVICE}"   ] && env_args="${env_args} -e VAAPI_DEVICE=${VAAPI_DEVICE}"
+[ "${VIDEO_CODEC}"     ] && env_args="${env_args} -e VIDEO_CODEC=${VIDEO_CODEC}"
+[ "${VIDEO_BITRATE}"   ] && env_args="${env_args} -e VIDEO_BITRATE=${VIDEO_BITRATE}"
+[ "${VIDEO_WIDTH}"     ] && env_args="${env_args} -e VIDEO_WIDTH=${VIDEO_WIDTH}"
+[ "${AUDIO_CODEC}"     ] && env_args="${env_args} -e AUDIO_CODEC=${AUDIO_CODEC}"
+[ "${AUDIO_BITRATE}"   ] && env_args="${env_args} -e AUDIO_BITRATE=${AUDIO_BITRATE}"
+[ "${AUDIO_CHANNELS}"  ] && env_args="${env_args} -e AUDIO_CHANNELS=${AUDIO_CHANNELS}"
+[ "${AUDIO_LANGUAGES}" ] && env_args="${env_args} -e AUDIO_LANGUAGES=${AUDIO_LANGUAGES}"
+[ "${VAAPI_DEVICE}"    ] && env_args="${env_args} -e VAAPI_DEVICE=${VAAPI_DEVICE}"
 
 docker-compose                               \
-  -f $(dirname "$0")/docker-compose.yml      \
+  --file $(dirname "$0")/docker-compose.yml  \
   run                                        \
+  --user "${user}"                           \
   --rm                                       \
   -v "${in_dir_host}:${in_dir_container}:ro" \
   -v "${out_dir_host}:${out_dir_container}"  \

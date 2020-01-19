@@ -11,10 +11,12 @@ services:
       - AUDIO_BITRATE=128k
       - AUDIO_CODEC=aac
       - AUDIO_CHANNELS=2
-      - AUDIO_LANGUAGE=deu
+      - AUDIO_LANGUAGES=deu,ger,eng
       - VAAPI_DEVICE=/dev/dri/renderD128
     volumes:
-      - ./entrypoint:/entrypoint
+      - ./entrypoint:/entrypoint:ro
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128
+    group_add:
+      - video
     entrypoint: [ "/entrypoint" ]
