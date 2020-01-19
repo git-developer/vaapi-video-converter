@@ -19,9 +19,9 @@ Convert a video to a small MP4 with stereo audio in german for use on a mobile d
 
 ```$ ./start /media/input.mkv /tmp/output.mp4```
 
-Use italian language:
+Use italian language; if not available, use english as fallback:
 
-```$ AUDIO_LANGUAGE=ita ./start /media/input.mkv /tmp/output.mkv```
+```$ AUDIO_LANGUAGES=ita,eng ./start /media/input.mkv /tmp/output.mkv```
 
 Create output video with permissions for user with user id and group id 1000:
 
@@ -35,7 +35,7 @@ The following list shows environment variables that may be used to adjust the fo
 - `AUDIO_BITRATE=128k`
 - `AUDIO_CODEC=aac`
 - `AUDIO_CHANNELS=2`
-- `AUDIO_LANGUAGE=deu`
+- `AUDIO_LANGUAGES=deu,ger,eng`
 - `VAAPI_DEVICE=/dev/dri/renderD128`
 - `PUID`=_uid of current user_
 - `GUID`=_group of current user_
